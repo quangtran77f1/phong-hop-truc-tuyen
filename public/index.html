@@ -1,20 +1,109 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Online Meeting Room</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Phòng họp trực tuyến</title>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/simple-peer@9.11.1/simplepeer.min.js"></script>
+  <style>
+    body { font-family: Arial; }
+    #videos { display: flex; flex-wrap: wrap; gap: 10px; }
+    video { width: 300px; border: 2px solid #333; border-radius: 8px; }
+  </style>
 </head>
 <body>
-  <h1>Phòng họp trực tuyến</h1>
-  <div id="videos"></div>
-  <div id="chat">
-    <ul id="messages"></ul>
-    <input id="messageInput" placeholder="Nhập tin nhắn...">
-    <button id="sendBtn">Gửi</button>
+  <h2>Phòng họp trực tuyến</h2>
+  <div id="login">
+    <input id="name" placeholder="Nhập tên của bạn">
+    <button onclick="joinRoom()">Tham gia</button>
   </div>
-  <button id="shareScreen">Chia sẻ màn hình</button>
-  <script src="/socket.io/socket.io.js"></script>
-  <script src="app.js"></script>
+  <div id="room" style="display:none;">
+    <h3>Xin chào, <span id="myName"></span></h3>
+    <div id="videos"></div>
+    <div>
+      <input id="msg" placeholder="Nhập tin nhắn">
+      <button onclick="sendMsg()">Gửi</button>
+    </div>
+    <ul id="chat"></ul>
+  </div>
+
+  <script>
+    const socket = io();
+    let peers = {};
+    let localStream;
+
+    async function joinRoom() {
+      const name = document.getElementById("name").value;
+      if (!name) return alert("Nhập tên trước!");
+
+      document.getElementById("login").style.display = "none";
+      document.getElementById("room").style.display = "block";
+      document.getElementById("myName").innerText = name;
+
+      socket.emit("join", name);
+
+      localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      addVideo(localStream, "Tôi");
+
+      socket.on("user-list", (users) => {
+        console.log("Người trong phòng:", users);
+      });
+
+      socket.on("chat", (data) => {
+        const li = document.createElement("li");
+        li.innerText = data.name + ": " + data.msg;
+        document.getElementById("chat").appendChild(li);
+      });
+
+      socket.on("signal", (data) => {
+        if (!peers[data.from]) {
+          createPeer(data.from, false, data.name);
+        }
+        peers[data.from].signal(data.signal);
+      });
+    }
+
+    function sendMsg() {
+      const msg = document.getElementById("msg").value;
+      if (!msg) return;
+      socket.emit("chat", msg);
+      document.getElementById("msg").value = "";
+    }
+
+    function createPeer(id, initiator, name) {
+      const peer = new SimplePeer({
+        initiator,
+        trickle: false,
+        stream: localStream
+      });
+
+      peer.on("signal", (signal) => {
+        socket.emit("signal", { to: id, signal });
+      });
+
+      peer.on("stream", (stream) => {
+        addVideo(stream, name);
+      });
+
+      peers[id] = peer;
+      return peer;
+    }
+
+    function addVideo(stream, label) {
+      const video = document.createElement("video");
+      video.srcObject = stream;
+      video.autoplay = true;
+      video.playsInline = true;
+      video.controls = false;
+
+      const div = document.createElement("div");
+      div.appendChild(video);
+      const caption = document.createElement("p");
+      caption.innerText = label;
+      div.appendChild(caption);
+
+      document.getElementById("videos").appendChild(div);
+    }
+  </script>
 </body>
 </html>
