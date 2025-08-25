@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Online Meeting Room</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Phòng họp trực tuyến</h1>
+  <div id="videos"></div>
+  <div id="chat">
+    <ul id="messages"></ul>
+    <input id="messageInput" placeholder="Nhập tin nhắn...">
+    <button id="sendBtn">Gửi</button>
+  </div>
+  <button id="shareScreen">Chia sẻ màn hình</button>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
