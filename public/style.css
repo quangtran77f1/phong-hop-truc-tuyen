@@ -1,0 +1,4 @@
+body { font-family: Arial, sans-serif; text-align: center; }
+#videos { display: flex; justify-content: center; gap: 10px; }
+video { width: 300px; height: 200px; border: 2px solid black; }
+#chat { margin-top: 20px; }
