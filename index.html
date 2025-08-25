@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Phòng họp trực tuyến</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="login-screen">
+    <h2>Nhập tên để tham gia</h2>
+    <input id="username" placeholder="Tên của bạn">
+    <button id="joinBtn">Tham gia</button>
+  </div>
+
+  <div id="meeting-screen" style="display:none;">
+    <div id="video-grid"></div>
+    <div id="controls">
+      <button id="shareScreen">📺 Chia sẻ màn hình</button>
+    </div>
+    <div id="chat">
+      <div id="messages"></div>
+      <input id="msgInput" placeholder="Nhập tin nhắn...">
+      <button id="sendBtn">Gửi</button>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
