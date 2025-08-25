@@ -34,3 +34,14 @@ socket.on("createMessage", message => {
   li.innerText = message;
   messages.appendChild(li);
 });
+// Screen sharing
+const shareBtn = document.getElementById("shareScreen");
+shareBtn.onclick = async () => {
+  try {
+    const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+    const screenVideo = document.createElement("video");
+    addVideoStream(screenVideo, screenStream);
+  } catch (err) {
+    console.error("Không thể chia sẻ màn hình:", err);
+  }
+};
