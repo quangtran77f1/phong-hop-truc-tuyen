@@ -1,24 +1,49 @@
-// Khởi tạo server và socket.io
-const express = require("express");
+
+const express = require('express');
+const http = require('http');
+const { Server } = require('socket.io');
+
 const app = express();
-const http = require("http").createServer(app);
-const io = require("socket.io")(http);
+const server = http.createServer(app);
+const io = new Server(server);
 
-app.use(express.static("public"));
+app.use(express.static('public'));
 
-io.on("connection", socket => {
-  socket.on("join-room", (roomId, userId, username) => {
-    socket.join(roomId);
-    socket.broadcast.to(roomId).emit("user-connected", userId, username);
+const rooms = new Map();
 
-    socket.on("message", msg => {
-      io.to(roomId).emit("createMessage", msg, username);
-    });
+io.on('connection', (socket) => {
+  let joinedRoom = null;
 
-    socket.on("disconnect", () => {
-      io.to(roomId).emit("user-disconnected", userId);
-    });
+  socket.on('join', ({ room, name }) => {
+    joinedRoom = room || 'main';
+    if (!rooms.has(joinedRoom)) rooms.set(joinedRoom, new Map());
+    const r = rooms.get(joinedRoom);
+    r.set(socket.id, { name });
+    socket.join(joinedRoom);
+
+    // gửi danh sách user hiện có
+    socket.emit('users', [...r.entries()].filter(([id]) => id !== socket.id)
+      .map(([id, u]) => ({ id, name: u.name })));
+
+    socket.to(joinedRoom).emit('user-joined', { id: socket.id, name });
+  });
+
+  socket.on('signal', ({ to, data }) => {
+    io.to(to).emit('signal', { from: socket.id, data });
+  });
+
+  socket.on('chat', (msg) => {
+    const r = rooms.get(joinedRoom);
+    const name = r?.get(socket.id)?.name || 'Unknown';
+    io.to(joinedRoom).emit('chat', { from: { id: socket.id, name }, text: msg });
+  });
+
+  socket.on('disconnect', () => {
+    const r = rooms.get(joinedRoom);
+    const name = r?.get(socket.id)?.name;
+    r?.delete(socket.id);
+    socket.to(joinedRoom).emit('user-left', { id: socket.id, name });
   });
 });
 
-http.listen(3000, () => console.log("Server running on http://localhost:3000"));
+server.listen(3000, () => console.log('Server chạy http://localhost:3000'));
