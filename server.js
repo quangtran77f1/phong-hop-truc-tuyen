@@ -1,44 +1,44 @@
 const express = require("express");
-const http = require("http");
-const { Server } = require("socket.io");
-
 const app = express();
-const server = http.createServer(app);
-const io = new Server(server);
+const http = require("http").createServer(app);
+const io = require("socket.io")(http);
 
 app.use(express.static("public"));
 
-let users = {}; // lưu danh sách người dùng: socket.id -> name
-
 io.on("connection", (socket) => {
-  console.log("Kết nối mới:", socket.id);
+  console.log("🔌 Người dùng kết nối:", socket.id);
 
-  socket.on("join", (name) => {
-    users[socket.id] = name;
-    io.emit("user-list", users);
-    console.log(`${name} đã tham gia`);
+  socket.on("join-room", ({ roomId, username }) => {
+    socket.join(roomId);
+    socket.to(roomId).emit("user-connected", { id: socket.id, username });
+    socket.data.username = username;
+    socket.data.roomId = roomId;
   });
 
-  socket.on("chat", (msg) => {
-    io.emit("chat", { name: users[socket.id], msg });
-  });
-
-  // Gửi tín hiệu WebRTC (camera + mic)
   socket.on("signal", (data) => {
     io.to(data.to).emit("signal", {
       from: socket.id,
       signal: data.signal,
-      name: users[socket.id],
+      username: socket.data.username,
+    });
+  });
+
+  socket.on("chat-message", (msg) => {
+    io.to(socket.data.roomId).emit("chat-message", {
+      username: socket.data.username,
+      message: msg,
     });
   });
 
   socket.on("disconnect", () => {
-    console.log(users[socket.id], "thoát");
-    delete users[socket.id];
-    io.emit("user-list", users);
+    if (socket.data.roomId) {
+      io.to(socket.data.roomId).emit("user-disconnected", {
+        id: socket.id,
+        username: socket.data.username,
+      });
+    }
   });
 });
 
-server.listen(3000, () => {
-  console.log("Server chạy tại http://localhost:3000");
-});
+const PORT = process.env.PORT || 3000;
+http.listen(PORT, () => console.log(`🚀 Server chạy tại http://localhost:${PORT}`));
