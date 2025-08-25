@@ -1,14 +1,36 @@
 const socket = io("/");
-const msgInput = document.getElementById("chat_message");
-const msgContainer = document.querySelector(".messages");
+const videoGrid = document.getElementById("videos");
+const myVideo = document.createElement("video");
+myVideo.muted = true;
 
-document.addEventListener("keydown", e => {
-  if (e.key === "Enter" && msgInput.value !== "") {
-    socket.emit("message", msgInput.value);
-    msgInput.value = "";
-  }
+navigator.mediaDevices.getUserMedia({
+  video: true,
+  audio: true
+}).then(stream => {
+  addVideoStream(myVideo, stream);
 });
 
-socket.on("createMessage", (msg, username) => {
-  msgContainer.innerHTML += `<div><b>${username}</b>: ${msg}</div>`;
+function addVideoStream(video, stream) {
+  video.srcObject = stream;
+  video.addEventListener("loadedmetadata", () => {
+    video.play();
+  });
+  videoGrid.append(video);
+}
+
+// Chat
+const msgInput = document.getElementById("messageInput");
+const sendBtn = document.getElementById("sendBtn");
+const messages = document.getElementById("messages");
+
+sendBtn.onclick = () => {
+  const message = msgInput.value;
+  socket.emit("message", "room1", message);
+  msgInput.value = "";
+};
+
+socket.on("createMessage", message => {
+  const li = document.createElement("li");
+  li.innerText = message;
+  messages.appendChild(li);
 });
