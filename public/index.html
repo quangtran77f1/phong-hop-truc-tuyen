@@ -1,20 +1,34 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <title>Online Meeting Room</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Meet Clone - Lobby</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Phòng họp trực tuyến</h1>
-  <div id="videos"></div>
-  <div id="chat">
-    <ul id="messages"></ul>
-    <input id="messageInput" placeholder="Nhập tin nhắn...">
-    <button id="sendBtn">Gửi</button>
+  <div class="center card">
+    <h1>Phòng họp trực tuyến</h1>
+    <label>Tên của bạn</label>
+    <input id="username" placeholder>
+    <label>Mã phòng</label>
+    <input id="room" placeholder>
+    <div class="row">
+      <button id="join" class="btn primary">Vào phòng</button>
+    </div>
+    <p class="muted">Nhập mã phòng để tạo phòng/ vào phòng.</p>
   </div>
-  <button id="shareScreen">Chia sẻ màn hình</button>
-  <script src="/socket.io/socket.io.js"></script>
-  <script src="app.js"></script>
+  <script>
+    document.getElementById('join').addEventListener('click', ()=>{
+      const name = document.getElementById('username').value.trim();
+      const room = document.getElementById('room').value.trim();
+      if(!name){ alert('Nhập tên'); return; }
+      if(!room){ alert('Nhập mã phòng'); return; }
+      const url = new URL(location.origin + '/meeting.html');
+      url.searchParams.set('name', name);
+      url.searchParams.set('room', room);
+      location.href = url.toString();
+    });
+  </script>
 </body>
 </html>
