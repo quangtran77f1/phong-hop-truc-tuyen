@@ -1,4 +1,26 @@
-body { font-family: Arial, sans-serif; text-align: center; }
-#videos { display: flex; justify-content: center; gap: 10px; }
-video { width: 300px; height: 200px; border: 2px solid black; }
-#chat { margin-top: 20px; }
+:root{--bg:#0b1020;--card:#141b2d;--muted:#9fb0c8;--primary:#4f7cff;--danger:#ff5d5d}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,Segoe UI,Roboto,Arial;background:var(--bg);color:#fff}
+.center{max-width:480px;margin:8vh auto;padding:16px}
+.card{background:var(--card);border-radius:12px;padding:16px}
+input{width:100%;padding:10px;border-radius:8px;border:1px solid #24334f;background:#0e1630;color:#fff;margin-bottom:8px}
+.row{display:flex;gap:8px}
+.btn{padding:8px 12px;border-radius:8px;border:0;cursor:pointer}
+.primary{background:var(--primary)}
+.danger{background:var(--danger);text-decoration:none;padding:8px 12px;border-radius:8px;color:#fff}
+.muted{color:var(--muted);font-size:13px}
+
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:#101731;border-bottom:1px solid #1e2742}
+.controls button{margin-left:6px;background:#1b2542;border-radius:8px;border:0;padding:8px;color:#fff;cursor:pointer}
+
+.layout{display:grid;grid-template-columns:1fr 320px;height:calc(100vh - 58px)}
+.video-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:8px;padding:10px;overflow:auto}
+.tile{position:relative;background:#000;border-radius:12px;overflow:hidden;aspect-ratio:16/10;border:1px solid #1f2a4d}
+video{width:100%;height:100%;object-fit:cover;background:#000}
+.name{position:absolute;left:8px;bottom:8px;background:rgba(0,0,0,.6);padding:4px 8px;border-radius:8px;font-size:12px}
+.badge{position:absolute;right:8px;bottom:8px;background:rgba(0,0,0,.6);padding:4px 8px;border-radius:8px;font-size:12px}
+.chat{border-left:1px solid #1e2742;background:#0e1630;display:flex;flex-direction:column}
+.chat.hidden{display:none}
+.messages{flex:1;overflow:auto;padding:10px}
+.chat-input{display:flex;gap:6px;padding:10px;border-top:1px solid #1e2742}
+.chat-input input{flex:1;padding:8px;border-radius:8px;border:1px solid #24334f;background:#0e1630;color:#fff}

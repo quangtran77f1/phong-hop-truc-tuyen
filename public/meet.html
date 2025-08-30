@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Meet Clone - Phòng họp</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div id="roomLabel"></div>
+    <div class="controls">
+      <button id="btnChat">💬</button>
+      <button id="btnScreen">🖥️</button>
+      <button id="btnMic">🎙️</button>
+      <button id="btnCam">📷</button>
+      <a href="index.html" class="btn danger">Rời phòng</a>
+    </div>
+  </header>
+  <main class="layout">
+    <section id="grid" class="video-grid"></section>
+    <aside id="chat" class="chat hidden">
+      <div id="messages" class="messages"></div>
+      <div class="chat-input">
+        <input id="chatInput" placeholder="Nhập tin nhắn...">
+        <button id="sendBtn">Gửi</button>
+      </div>
+    </aside>
+  </main>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="client.js"></script>
+</body>
+</html>
